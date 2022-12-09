@@ -16,7 +16,7 @@ dotenv.config({ path: "back-end/config/config.env" });
 
 const fileStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "images");
+    cb(null, "back-end/images");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
@@ -64,10 +64,10 @@ app.use("/api/v1", userRoute);
 app.use("/api/v1", orderRoute);
 app.use("/api/v1", paymentRoute);
 
-// app.use(express.static(path.join("../front-end/build")))
-// app.get("*",(req,res,next)=>{
-//   res.sendFile(path.join("../front-end/build/index.html"))
-// })
+app.use(express.static(path.join("./build")))
+app.get("*",(req,res,next)=>{
+  res.sendFile(path.join("./build/index.html"))
+})
 
 app.use(errorMiddleware);
 
