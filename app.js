@@ -12,7 +12,7 @@ const orderRoute = require("./routes/orderRoute");
 const paymentRoute = require("./routes/paymentRoute");
 
 const app = express();
-dotenv.config({ path: "back-end/config/config.env" });
+dotenv.config({ path: "./config/config.env" });
 
 const fileStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -65,8 +65,9 @@ app.use("/api/v1", orderRoute);
 app.use("/api/v1", paymentRoute);
 
 app.use(express.static(path.join("./build")))
+
 app.get("*",(req,res,next)=>{
-  res.sendFile(path.join("./build/index.html"))
+  res.sendFile("index.html",{root:path.join(__dirname,"build")})
 })
 
 app.use(errorMiddleware);
