@@ -34,6 +34,15 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,DELETE, PUT");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).fields([
@@ -42,8 +51,8 @@ app.use(
   ])
 );
 
-app.use(bodyParser.json({limit:"10mb"}));
-app.use(bodyParser.urlencoded({ extended: true,limit:"10mb" }));
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(express.json());
 app.use(cookieParser());
