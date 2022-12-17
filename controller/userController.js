@@ -13,8 +13,8 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
   if (JSON.stringify(req.files) === JSON.stringify({})) {
     return next(new ErrorHandler("Please Upload Image", 400));
   } else {
-    const { result, imageName } = await upload(req.files.avatar[0]);
-    avatar = req.files.avatar[0].originalname;
+    // const  imageName = await upload(req.files.avatar[0]);
+    avatar = req.files.avatar[0].path;
   }
   const { name, email, password } = req.body;
   const user = await User.create({
@@ -139,9 +139,9 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 exports.getUserDetails = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
-  const url = await download(user.avatar);
+  // const url = await download(user.avatar);
 
-  user.avatar = url;
+  // user.avatar = url;
 
   return res.status(200).json({
     success: true,
@@ -176,12 +176,15 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
   let newUserData;
 
   if (JSON.stringify(req.files) !== JSON.stringify({})) {
-   await deleteImage(user.avatar);
-   const { imageName } = await upload(req.files.avatar[0]);
+  //  await deleteImage(user.avatar);
+  //  const  imageName  = await upload(req.files.avatar[0]);
+  if (fs.existsSync(user.avatar)) {
+    fs.unlinkSync(user.avatar);
+  }
     newUserData = {
       name: req.body.name,
       email: req.body.email,
-      avatar: imageName,
+      avatar: req.files.avatar[0].path,
     };
   } else {
     newUserData = {
@@ -257,8 +260,10 @@ exports.deleteUser = catchAsyncError(async (req, res, next) => {
     );
   }
 
-  await deleteImage(user.avatar);
-
+  // await deleteImage(user.avatar);
+  if (fs.existsSync(user.avatar)) {
+    fs.unlinkSync(user.avatar);
+  }
   await user.remove();
 
   return res.status(200).json({

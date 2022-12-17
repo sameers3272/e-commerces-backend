@@ -14,26 +14,26 @@ const paymentRoute = require("./routes/paymentRoute");
 const app = express();
 dotenv.config({ path: "./config/config.env" });
 
-// const fileStorage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./images");
-//   },
-//   // filename: function (req, file, cb) {
-//   //   cb(null, Date.now() + "-" + file.originalname);
-//   // },
-// });
+const fileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
-// const fileFilter = (req, file, cb) => {
-//   if (
-//     file.mimetype === "image/png" ||
-//     file.mimetype === "image/jpg" ||
-//     file.mimetype === "image/jpeg"
-//   ) {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -45,9 +45,9 @@ app.use(function (req, res, next) {
   next();
 });
 
-const storage = multer.memoryStorage({});
+// const storage = multer.memoryStorage({});
 app.use(
-  multer({ storage }).fields([
+  multer({ storage:fileStorage,fileFilter:fileFilter }).fields([
     { name: "avatar", maxCount: 1 },
     { name: "images", maxCount: 5 },
   ])
@@ -58,6 +58,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/images",express.static(path.join(__dirname,"images")))
 
 app.use("/api/v1", ProductRouter);
 app.use("/api/v1", userRoute);

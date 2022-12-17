@@ -35,8 +35,8 @@ exports.upload = async (file) => {
 
     const command = new PutObjectCommand(params);
 
-    const result = await s3.send(command);
-    return { result, imageName };
+    await s3.send(command);
+    return imageName;
   } catch (error) {
     return error;
   }
@@ -125,23 +125,21 @@ exports.getImages = async (images) => {
   return imageUrls;
 };
 
+exports.uploadOrder = async (file, key) => {
+  try {
+    const orderName = "orders/" + key;
+    const params = {
+      Bucket: bucketName,
+      Body: file,
+      Key: orderName,
+      ContentType: "text/pdf",
+    };
 
+    const command = new PutObjectCommand(params);
 
-exports.uploadOrder = async (file,key) => {
-    try {
-      const orderName = "orders/"+ key;
-      const params = {
-        Bucket: bucketName,
-        Body: file,
-        Key: orderName,
-        ContentType: "text/pdf",
-      };
-  
-      const command = new PutObjectCommand(params);
-  
-      const result = await s3.send(command);
-      return { result, orderName };
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    const result = await s3.send(command);
+    return { result, orderName };
+  } catch (error) {
+    console.log(error);
+  }
+};
