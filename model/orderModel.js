@@ -97,6 +97,7 @@ const orderSchema = new mongoose.Schema({
         required: true,
         default: "Processing",
     },
+    invoicePath:String,
     deliveredAt: Date,
     createdAt: {
         type: Date,

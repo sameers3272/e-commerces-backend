@@ -12,6 +12,15 @@ exports.processPayment = catchAsyncError(async (req, res, next) => {
       company: "Ecommerce",
     },
   });
+  // const myPayment = await stripe.checkout.sessions.create({
+  //   success_url: '/payment/success',
+  //   cancel_url: '/payment/fail',
+  //   line_items: [
+  //     {price: 'price_H5ggYwtDq4fbrJ', quantity: 2},
+  //   ],
+  //   mode: 'payment',
+  
+  // });
 
   res.status(200).json({
     success: true,

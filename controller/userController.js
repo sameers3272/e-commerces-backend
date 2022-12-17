@@ -5,6 +5,7 @@ const sendToken = require("../utils/jwtToken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
 const fs = require("fs");
+const { upload, download, deleteImage } = require("../utils/S3");
 
 //Register a User
 exports.registerUser = catchAsyncError(async (req, res, next) => {
@@ -12,8 +13,8 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
   if (JSON.stringify(req.files) === JSON.stringify({})) {
     return next(new ErrorHandler("Please Upload Image", 400));
   } else {
-    console.log(req.files);
-    avatar = req.files.avatar[0].path;
+    const { result, imageName } = await upload(req.files.avatar[0]);
+    avatar = req.files.avatar[0].originalname;
   }
   const { name, email, password } = req.body;
   const user = await User.create({
@@ -75,7 +76,9 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
   //                                          req.get("host")
-  const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
+  const resetPasswordUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/password/reset/${resetToken}`;
 
   const message = `<p>Your password reset token is :- \n\n${resetPasswordUrl}<br />If you have not requested then please ignore it</p>`;
 
@@ -136,6 +139,10 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 exports.getUserDetails = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
+  const url = await download(user.avatar);
+
+  user.avatar = url;
+
   return res.status(200).json({
     success: true,
     user,
@@ -164,16 +171,17 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
 });
 
 exports.updateProfile = catchAsyncError(async (req, res, next) => {
-  const oldUser = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id);
 
   let newUserData;
 
   if (JSON.stringify(req.files) !== JSON.stringify({})) {
-    fs.unlinkSync(oldUser.avatar);
+   await deleteImage(user.avatar);
+   const { imageName } = await upload(req.files.avatar[0]);
     newUserData = {
       name: req.body.name,
       email: req.body.email,
-      avatar: req.files.avatar[0].path,
+      avatar: imageName,
     };
   } else {
     newUserData = {
@@ -182,7 +190,7 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
     };
   }
 
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+  await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -249,7 +257,7 @@ exports.deleteUser = catchAsyncError(async (req, res, next) => {
     );
   }
 
-  fs.unlinkSync(user.avatar);
+  await deleteImage(user.avatar);
 
   await user.remove();
 

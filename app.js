@@ -14,26 +14,27 @@ const paymentRoute = require("./routes/paymentRoute");
 const app = express();
 dotenv.config({ path: "./config/config.env" });
 
-const fileStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+// const fileStorage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./images");
+//   },
+//   // filename: function (req, file, cb) {
+//   //   cb(null, Date.now() + "-" + file.originalname);
+//   // },
+// });
 
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
+// const fileFilter = (req, file, cb) => {
+//   if (
+//     file.mimetype === "image/png" ||
+//     file.mimetype === "image/jpg" ||
+//     file.mimetype === "image/jpeg"
+//   ) {
+//     cb(null, true);
+//   } else {
+//     cb(null, false);
+//   }
+// };
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,POST,DELETE, PUT");
@@ -44,8 +45,9 @@ app.use(function (req, res, next) {
   next();
 });
 
+const storage = multer.memoryStorage({});
 app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).fields([
+  multer({ storage }).fields([
     { name: "avatar", maxCount: 1 },
     { name: "images", maxCount: 5 },
   ])
@@ -56,8 +58,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(express.json());
 app.use(cookieParser());
-
-app.use("/images", express.static("images"));
 
 app.use("/api/v1", ProductRouter);
 app.use("/api/v1", userRoute);
