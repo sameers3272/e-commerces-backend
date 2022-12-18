@@ -4,8 +4,6 @@ const fs = require("fs");
 const Product = require("../model/productModel");
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const ErrorHandler = require("../utils/errorHandler");
-const { createInvoice } = require("../utils/createInvoice");
-const { uploadOrder } = require("../utils/S3");
 
 // new order creating
 exports.newOrder = catchAsyncError(async (req, res, next) => {

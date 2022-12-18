@@ -14,26 +14,6 @@ const paymentRoute = require("./routes/paymentRoute");
 const app = express();
 dotenv.config({ path: "./config/config.env" });
 
-const fileStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -44,6 +24,37 @@ app.use(function (req, res, next) {
   );
   next();
 });
+
+
+
+const fileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if(req.files.avatar===undefined)
+    cb(null, path.join("./images/products"));
+    else
+    cb(null, path.join("./images/users"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+
+  
+  const fileFilter = (req, file, cb) => {
+    if (
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  };
+
+  
+
 
 // const storage = multer.memoryStorage({});
 app.use(

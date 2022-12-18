@@ -5,7 +5,6 @@ const sendToken = require("../utils/jwtToken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
 const fs = require("fs");
-const { upload, download, deleteImage } = require("../utils/S3");
 
 //Register a User
 exports.registerUser = catchAsyncError(async (req, res, next) => {

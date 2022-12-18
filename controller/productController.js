@@ -3,7 +3,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const Product = require("../model/productModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const fs = require("fs");
-const { uploadImages, deleteImages, getImages } = require("../utils/S3");
+
 
 //Getting all products
 exports.getAllProducts = catchAsyncError(async (req, res, next) => {
@@ -75,11 +75,11 @@ exports.createProduct = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("please upload atleast one image", 400));
   }
 
-  
+  // console.log(req.files)
 
   // req.body.images = await uploadImages(images);
 
-  req.body.images = req.files.images &&
+  req.body.images = req.files &&
    req.files.images.map((obj) => {
     return obj.path;
   });
@@ -101,7 +101,7 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("No product found", 404));
   }
 
-  if (req.files.images) {
+  if (req.files) {
     product.images.forEach((img) => {
     if (fs.existsSync(img)) {
       fs.unlinkSync(img);
