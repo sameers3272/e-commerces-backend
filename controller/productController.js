@@ -103,6 +103,7 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
 
   if (JSON.stringify(req.files) !== JSON.stringify({})) {
     product.images.forEach((img) => {
+      
     if (fs.existsSync(img)) {
       fs.unlinkSync(img);
     }
