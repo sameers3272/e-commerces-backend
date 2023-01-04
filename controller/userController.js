@@ -11,10 +11,10 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
   let avatar;
   if (JSON.stringify(req.files) === JSON.stringify({})) {
     return next(new ErrorHandler("Please Upload Image", 400));
-  } else {
+  } 
     // const  imageName = await upload(req.files.avatar[0]);
     avatar = req.files.avatar[0].path;
-  }
+ 
   const { name, email, password } = req.body;
   const user = await User.create({
     name,

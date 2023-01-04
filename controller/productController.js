@@ -71,7 +71,7 @@ exports.createProduct = catchAsyncError(async (req, res, next) => {
 
   req.body.user = req.user._id;
 
-  if (!req.files) {
+  if (JSON.stringify(req.files) === JSON.stringify({})) {
     return next(new ErrorHandler("please upload atleast one image", 400));
   }
 
@@ -101,13 +101,14 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("No product found", 404));
   }
 
-  if (req.files) {
+  if (JSON.stringify(req.files) !== JSON.stringify({})) {
     product.images.forEach((img) => {
     if (fs.existsSync(img)) {
       fs.unlinkSync(img);
     }
     // await deleteImages(product.images);
     });
+    console.log(req.files);
     req.body.images = req.files.images.map(img=>img.path);
     // req.body.images = await uploadImages(images);
   }
